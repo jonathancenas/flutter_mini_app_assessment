@@ -1,29 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
-import 'package:flutter_mini_app_assessment/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+import 'package:flutter_mini_app_assessment/features/launches/domain/entities/launch.dart';
+import 'package:flutter_mini_app_assessment/features/launches/domain/repositories/launch_repository.dart';
+import 'package:flutter_mini_app_assessment/features/launches/domain/usecases/get_launches.dart';
+
+class MockRepository extends Mock implements LaunchRepository {}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const LoginPage());
+  late GetLaunches usecase;
+  late MockRepository mockRepository;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  setUp(() {
+    mockRepository = MockRepository();
+    usecase = GetLaunches(mockRepository);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('should return launches from repository', () async {
+    final launches = [
+      Launch(id: '1', name: 'Test Launch', date: DateTime.now(), success: true),
+    ];
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    when(() => mockRepository.getLaunches()).thenAnswer((_) async => launches);
+
+    final result = await usecase();
+
+    expect(result, launches);
+    verify(() => mockRepository.getLaunches()).called(1);
   });
 }

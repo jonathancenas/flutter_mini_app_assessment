@@ -17,25 +17,30 @@ class HomePage extends StatelessWidget {
           }
 
           if (state is LaunchLoaded) {
-            return ListView.builder(
-              itemCount: state.launches.length,
-              itemBuilder: (context, index) {
-                final launch = state.launches[index];
-
-                return ListTile(
-                  title: Text(launch.name),
-                  subtitle: Text(
-                    '${launch.date.toLocal()} • ${launch.success ? "Success" : "Fail"}',
-                  ),
-                  trailing: const Icon(Icons.arrow_forward),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => DetailsPage(launch)),
-                    );
-                  },
-                );
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<LaunchBloc>().add(FetchLaunches());
               },
+              child: ListView.builder(
+                itemCount: state.launches.length,
+                itemBuilder: (context, index) {
+                  final launch = state.launches[index];
+
+                  return ListTile(
+                    title: Text(launch.name),
+                    subtitle: Text(
+                      '${launch.date.toLocal()} • ${launch.success ? "Success" : "Fail"}',
+                    ),
+                    trailing: const Icon(Icons.arrow_forward),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => DetailsPage(launch)),
+                      );
+                    },
+                  );
+                },
+              ),
             );
           }
 

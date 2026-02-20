@@ -26,9 +26,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => LaunchBloc(usecase),
-      child: const MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+        home: const LoginPage(),
       ),
     );
   }
